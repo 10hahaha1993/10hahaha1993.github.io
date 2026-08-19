@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#5d8f9b">
+<title>復健小任務</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    background: #f3f7f7; color: #294247;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 18px 14px 40px; }
+  header {
+    background: linear-gradient(145deg,#5d8f9b,#78aab2); color:white;
+    border-radius: 24px; padding: 24px 20px; box-shadow: 0 8px 24px #00000012;
+  }
+  h1 { margin: 0 0 6px; font-size: 30px; }
+  .subtitle { font-size: 16px; opacity:.95; }
+  .encourage {
+    margin-top: 16px; background:#ffffff22; border-radius:16px; padding:13px 14px;
+    font-size:18px; font-weight:700; min-height:50px;
+  }
+  .progress-card, .card, .tip, .history {
+    background:white; border-radius:20px; margin-top:14px; padding:18px;
+    box-shadow: 0 5px 18px #0000000c;
+  }
+  .progress-title { display:flex; justify-content:space-between; font-weight:800; font-size:18px; }
+  .bar { height:13px; background:#e5eeee; border-radius:99px; margin:12px 0 7px; overflow:hidden; }
+  .fill { height:100%; width:0; background:#5d8f9b; transition:.25s; border-radius:99px; }
+  .small { color:#688086; font-size:14px; }
+  .card { border-left: 6px solid #8bb3b9; }
+  .card.done { border-left-color:#5d9b72; background:#fbfffc; }
+  .card.rest { opacity:.72; }
+  .name { font-size:22px; font-weight:900; margin-bottom:4px; }
+  .goal { font-size:15px; color:#61767b; margin-bottom:12px; }
+  .notice { background:#fff8e8; padding:10px 12px; border-radius:12px; font-size:14px; margin:10px 0; }
+  .controls { display:flex; align-items:center; gap:10px; }
+  .count { font-size:28px; font-weight:900; min-width:100px; text-align:center; }
+  button {
+    border:0; border-radius:14px; padding:13px 17px; font-size:17px; font-weight:800;
+    cursor:pointer; background:#5d8f9b; color:white; min-height:50px;
+  }
+  button.secondary { background:#e7f0f1; color:#41666d; }
+  button.complete { background:#6a9d79; }
+  button:active { transform:scale(.98); }
+  .actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  details { margin-top:12px; }
+  summary { cursor:pointer; font-weight:800; padding:5px 0; }
+  .instruction { line-height:1.65; color:#4f656a; font-size:15px; padding-top:8px; }
+  .timer { font-size:40px; font-weight:900; text-align:center; margin:8px 0; }
+  .rest-label { color:#6a8b91; font-weight:800; }
+  .tip { background:#edf6f5; font-size:15px; line-height:1.7; }
+  .history h2 { margin:0 0 10px; font-size:20px; }
+  .history-row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #edf1f1; }
+  .history-row:last-child { border-bottom:0; }
+  .badge { font-weight:800; }
+  .modal {
+    position:fixed; inset:0; background:#17333899; display:none; align-items:center; justify-content:center;
+    padding:22px; z-index:10;
+  }
+  .modal.show { display:flex; }
+  .modal-box { background:white; border-radius:24px; padding:28px 22px; max-width:420px; width:100%; text-align:center; }
+  .big { font-size:50px; }
+  .modal-box h2 { margin:8px 0; font-size:26px; }
+  .modal-box p { font-size:18px; line-height:1.6; color:#53696e; }
+  .footer { text-align:center; color:#819397; font-size:12px; padding:18px 8px 0; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>復健小任務 💪</h1>
+    <div class="subtitle" id="dateText"></div>
+    <div class="encourage" id="encourage">慢慢來，一點一點累積，就是進步。</div>
+  </header>
+
+  <section class="progress-card">
+    <div class="progress-title"><span>今日完成度</span><span id="percent">0%</span></div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="small" id="summary">今天一起完成復健小任務吧！</div>
+  </section>
+
+  <main id="exerciseList"></main>
+
+  <section class="tip">
+    <strong>⚠️ 小提醒</strong><br>
+    這個網頁是協助記錄與跟著做，動作與次數以物理治療師今天評估後的指示為準。
+    若出現明顯疼痛、不舒服，或和治療師交代的方式不同，請先停止並詢問治療師。
+  </section>
+
+  <section class="history">
+    <h2>📅 最近復健紀錄</h2>
+    <div id="historyList"></div>
+  </section>
+
+  <div class="footer">紀錄會儲存在這台手機的瀏覽器中，不需要登入。</div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="big">🎉</div>
+    <h2>今天完成了！</h2>
+    <p id="modalText">很棒！一步一步累積，讓身體做好更充分的準備。</p>
+    <button onclick="closeModal()">繼續加油</button>
+  </div>
+</div>
+
+<script>
+const encouragements = [
+  "慢慢來，一點一點累積，就是進步。",
+  "今天完成一點，明天就多一點準備。💪",
+  "不用急，穩穩做好每一次就很棒。",
+  "把今天該做的完成，就是很棒的進步。",
+  "持續累積，讓身體一步一步準備好。",
+  "今天也為恢復多存一點力量。",
+  "做得好不好不是重點，持續才是力量。",
+  "一步一步來，穩穩地向前進。"
+];
+
+const exercises = [
+  {
+    id:"breath", icon:"🌬️", name:"深呼吸", type:"timer", target:300,
+    goal:"累積 5 分鐘／每天",
+    instruction:"平躺（可以把雙腳彎曲），也可以坐姿或站姿。吸氣時肚子及胸口鼓起，吐氣時肚子及胸口陷下去。肩膀不要用力。",
+    note:"💡 累積 5 分鐘／每天"
+  },
+  {
+    id:"bridge", icon:"🍑", name:"臀橋", type:"count", target:30, everyOther:true,
+    goal:"30 下／做一天休一天",
+    instruction:"平躺，雙腳彎曲踩著床。慢慢把尾椎、屁股捲起來，感受下腹部用力，再慢慢放回去。",
+    note:"⚠️ 不能腰酸；在可以的範圍下將屁股儘量往上抬高。"
+  },
+  {
+    id:"legraise", icon:"🦵", name:"直膝抬腿", type:"count", target:30, everyOther:true,
+    goal:"累積 30 下／做一天休一天",
+    instruction:"平躺。先將膝蓋用力伸直，感受大腿前側出力；確定會了後，其中一腳膝蓋伸直往上抬高，再慢慢放下。重複 5 下後換對側腳。",
+    note:"🔥 主要感受大腿前側出力。"
+  },
+  {
+    id:"clam", icon:"🦪", name:"側躺蚌殼式", type:"count", target:30, everyOther:true,
+    goal:"累積 30 下／做一天休一天",
+    instruction:"側躺，軀幹與骨盆呈一直線，雙膝彎曲，腳跟貼合。慢慢將上方膝蓋往上打開，感受上方腳的屁股發力。",
+    note:"🔥 主要感受臀肌出力。"
+  },
+  {
+    id:"sitstand", icon:"🪑", name:"坐到站", type:"count", target:30, everyOther:true,
+    goal:"累積 30 下／做一天休一天",
+    instruction:"坐姿，雙腳踩穩。身體往前傾，慢慢站起來、站直，再慢慢坐回去。",
+    note:"💡 累積 30 下／做一天休一天"
+  }
+];
+
+const todayKey = new Date().toISOString().slice(0,10);
+let data = JSON.parse(localStorage.getItem("rehab_"+todayKey) || "{}");
+
+function isExerciseDay(ex) {
+  if (!ex.everyOther) return true;
+  // 以 2026-08-19（本次評估日）作為第一個運動日，之後一天做、一天休。
+  const start = new Date("2026-08-19T00:00:00");
+  const now = new Date(todayKey+"T00:00:00");
+  const diff = Math.floor((now-start)/86400000);
+  return diff >= 0 ? diff % 2 === 0 : true;
+}
+
+function save() {
+  localStorage.setItem("rehab_"+todayKey, JSON.stringify(data));
+}
+
+function render() {
+  const list = document.getElementById("exerciseList");
+  list.innerHTML = "";
+  exercises.forEach(ex => {
+    const rest = !isExerciseDay(ex);
+    const value = data[ex.id] || 0;
+    const done = rest || (value >= ex.target);
+    const card = document.createElement("section");
+    card.className = "card " + (done ? "done " : "") + (rest ? "rest" : "");
+    let body = `
+      <div class="name">${ex.icon} ${ex.name}</div>
+      <div class="goal">${rest ? '<span class="rest-label">🌙 今天是休息日</span>' : ex.goal}</div>
+      <details><summary>查看動作方式</summary><div class="instruction">${ex.instruction}</div></details>
+      <div class="notice">${ex.note}</div>
+    `;
+    if (rest) {
+      body += `<div class="actions"><button class="secondary" disabled>今天休息，明天再繼續 🌙</button></div>`;
+    } else if (ex.type === "count") {
+      body += `
+        <div class="controls">
+          <button class="secondary" onclick="changeCount('${ex.id}',-1)">−</button>
+          <div class="count" id="count-${ex.id}">${Math.min(value,ex.target)} / ${ex.target}</div>
+          <button onclick="changeCount('${ex.id}',1)">＋ 1</button>
+        </div>
+        <div class="actions">
+          <button class="${done?'complete':''}" onclick="complete('${ex.id}')">${done?'✓ 已完成':'完成這項'}</button>
+          <button class="secondary" onclick="resetOne('${ex.id}')">重設</button>
+        </div>`;
+    } else {
+      const sec = value || 0;
+      body += `
+        <div class="timer" id="timer-${ex.id}">${formatTime(sec)}</div>
+        <div class="actions">
+          <button onclick="toggleTimer()">▶ 開始／暫停</button>
+          <button class="secondary" onclick="resetTimer()">重新計時</button>
+        </div>`;
+    }
+    card.innerHTML = body;
+    list.appendChild(card);
+  });
+  updateProgress();
+  renderHistory();
+}
+
+function changeCount(id, delta) {
+  const ex = exercises.find(x=>x.id===id);
+  data[id] = Math.max(0, Math.min(ex.target, (data[id]||0)+delta));
+  save(); render();
+  if (data[id] === ex.target) maybeCelebrate();
+}
+function complete(id) {
+  const ex = exercises.find(x=>x.id===id);
+  data[id] = ex.target; save(); render(); maybeCelebrate();
+}
+function resetOne(id) { data[id]=0; save(); render(); }
+
+let timer = null, running = false;
+function toggleTimer() {
+  if (running) { clearInterval(timer); running=false; return; }
+  running=true;
+  timer=setInterval(()=>{
+    data.breath = Math.min(300,(data.breath||0)+1);
+    save();
+    const el=document.getElementById("timer-breath");
+    if(el) el.textContent=formatTime(data.breath);
+    updateProgress();
+    if(data.breath>=300){ clearInterval(timer); running=false; maybeCelebrate(); render(); }
+  },1000);
+}
+function resetTimer() {
+  clearInterval(timer); running=false; data.breath=0; save(); render();
+}
+function formatTime(s) {
+  s=Math.max(0,Math.min(300,s||0));
+  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+}
+function updateProgress() {
+  let total=0, done=0;
+  exercises.forEach(ex=>{
+    if(!isExerciseDay(ex)) return;
+    total++;
+    if((data[ex.id]||0)>=ex.target) done++;
+  });
+  const pct=total?Math.round(done/total*100):100;
+  document.getElementById("percent").textContent=pct+"%";
+  document.getElementById("fill").style.width=pct+"%";
+  document.getElementById("summary").textContent =
+    pct===100 ? "🎉 今天全部完成！很棒！" : `已完成 ${done} / ${total} 項，慢慢來就好。`;
+}
+function maybeCelebrate() {
+  setTimeout(()=>{
+    let total=0, done=0;
+    exercises.forEach(ex=>{
+      if(!isExerciseDay(ex)) return;
+      total++;
+      if((data[ex.id]||0)>=ex.target) done++;
+    });
+    if(total && done===total) {
+      document.getElementById("modalText").textContent =
+        encouragements[Math.floor(Math.random()*encouragements.length)];
+      document.getElementById("modal").classList.add("show");
+    }
+  },100);
+}
+function closeModal(){document.getElementById("modal").classList.remove("show");}
+
+function renderHistory() {
+  const box=document.getElementById("historyList");
+  const rows=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const key=d.toISOString().slice(0,10);
+    const rec=JSON.parse(localStorage.getItem("rehab_"+key)||"{}");
+    const label=`${d.getMonth()+1}/${d.getDate()}`;
+    let total=0,done=0;
+    exercises.forEach(ex=>{
+      // history uses same alternating schedule based on assessment date
+      const start=new Date("2026-08-19T00:00:00");
+      const cur=new Date(key+"T00:00:00");
+      const diff=Math.floor((cur-start)/86400000);
+      const active=!ex.everyOther || diff%2===0 || diff<0;
+      if(!active) return;
+      total++; if((rec[ex.id]||0)>=ex.target) done++;
+    });
+    const pct=total?Math.round(done/total*100):100;
+    rows.push(`<div class="history-row"><span>${label}</span><span class="badge">${pct===100?"⭐ 完成":pct+"%"}</span></div>`);
+  }
+  box.innerHTML=rows.join("");
+}
+
+document.getElementById("dateText").textContent =
+  new Intl.DateTimeFormat("zh-TW",{year:"numeric",month:"long",day:"numeric",weekday:"long"}).format(new Date());
+document.getElementById("encourage").textContent =
+  encouragements[new Date().getDate()%encouragements.length];
+render();
+</script>
+</body>
+</html>
