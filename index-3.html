@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#5d8f9b">
+<title>爸爸的腰椎術後復健</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif;background:#f3f7f7;color:#294247}
+.wrap{max-width:680px;margin:0 auto;padding:18px 14px 40px}
+header{background:linear-gradient(145deg,#5d8f9b,#78aab2);color:white;border-radius:24px;padding:26px 21px;box-shadow:0 8px 24px #00000012}
+h1{margin:0 0 7px;font-size:36px}.subtitle{font-size:20px;opacity:.95}.encourage{margin-top:16px;background:#ffffff22;border-radius:16px;padding:14px 15px;font-size:22px;font-weight:700;min-height:50px}
+.progress-card,.card,.tip,.history{background:white;border-radius:20px;margin-top:14px;padding:19px;box-shadow:0 5px 18px #0000000c}
+.progress-title{display:flex;justify-content:space-between;font-weight:800;font-size:22px}.bar{height:14px;background:#e5eeee;border-radius:99px;margin:12px 0 7px;overflow:hidden}.fill{height:100%;width:0;background:#5d8f9b;transition:.25s;border-radius:99px}.small{color:#688086;font-size:17px}
+.card{border-left:6px solid #8bb3b9}.card.done{border-left-color:#5d9b72;background:#fbfffc}.name{font-size:27px;font-weight:900;margin-bottom:5px}.goal{font-size:19px;color:#61767b;margin-bottom:12px}.notice{background:#fff8e8;padding:11px 13px;border-radius:12px;font-size:17px;margin:10px 0;line-height:1.6}
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.count{font-size:32px;font-weight:900;min-width:110px;text-align:center}
+button{border:0;border-radius:14px;padding:14px 18px;font-size:20px;font-weight:800;cursor:pointer;background:#5d8f9b;color:white;min-height:54px}button.secondary{background:#e7f0f1;color:#41666d}button.complete{background:#6a9d79}.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+details{margin-top:12px}summary{cursor:pointer;font-weight:800;padding:6px 0;font-size:19px}.instruction{line-height:1.7;color:#4f656a;font-size:18px;padding-top:8px}.timer{font-size:48px;font-weight:900;text-align:center;margin:8px 0}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.twocol button{width:100%}.tip{background:#edf6f5;font-size:18px;line-height:1.7}.history h2{margin:0 0 10px;font-size:24px}.history-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #edf1f1;font-size:18px}.badge{font-weight:800}.footer{text-align:center;color:#819397;font-size:15px;padding:18px 8px 0;line-height:1.6}
+.walkinput{width:90px;padding:12px;border:2px solid #dbe7e8;border-radius:12px;font-size:20px;text-align:center}.walklog{font-size:17px;color:#61767b;line-height:1.7;margin-top:10px}
+</style>
+</head><body><div class="wrap">
+<header><h1>復健小任務 💪</h1><div class="subtitle" id="dateText"></div><div class="encourage">慢慢來，一點一點累積，就是進步。</div></header>
+<section class="progress-card"><div class="progress-title"><span>今日完成度</span><span id="percent">0%</span></div><div class="bar"><div class="fill" id="fill"></div></div><div class="small" id="summary">今天一起完成復健小任務吧！</div></section>
+
+<main>
+<section class="card" id="card-breath"><div class="name">🌬️ 深呼吸</div><div class="goal">早、晚各 5 分鐘</div>
+<details><summary>查看方式</summary><div class="instruction">自然、緩慢地呼吸，不需要刻意吸到最深，也不要憋氣。</div></details>
+<div class="timer" id="timer">05:00</div><div class="actions"><button id="timerBtn">▶ 開始</button><button class="secondary" id="resetTimer">重新計時</button></div>
+<div class="twocol"><button id="breathAM">☀️ 早上完成</button><button id="breathPM">🌙 晚上完成</button></div></section>
+
+<section class="card" id="card-ankle"><div class="name">🦶 腳踝運動</div><div class="goal">20 下 × 3–5 回／天</div>
+<details><summary>查看方式</summary><div class="instruction">腳踝慢慢往上勾、再往下踩，活動腳踝。動作自然即可，不需要憋氣。</div></details>
+<div class="actions"><button id="ankleDone">✓ 今日完成</button></div></section>
+
+<section class="card" id="card-slr"><div class="name">🦵 直膝抬腿</div><div class="goal">左右各 5–10 下／組｜早、晚各 1～2 組</div>
+<details><summary>查看方式</summary><div class="instruction">平躺，膝蓋伸直，慢慢抬起一側腿，再慢慢放下。左右腳依照可接受程度完成。</div></details>
+<div class="twocol"><button class="setbtn" data-k="slrAM" data-v="1">☀️ 早上 1 組</button><button class="setbtn" data-k="slrAM" data-v="2">☀️ 早上 2 組</button><button class="setbtn" data-k="slrPM" data-v="1">🌙 晚上 1 組</button><button class="setbtn" data-k="slrPM" data-v="2">🌙 晚上 2 組</button></div></section>
+
+<section class="card" id="card-quad"><div class="name">🦵 壓腳背</div><div class="goal">10 下／組，每下約 5 秒｜早、晚各 1～2 組</div>
+<details><summary>查看方式</summary><div class="instruction">膝蓋伸直，大腿前側出力，腳背往下壓／膝窩往床面靠，維持約 5 秒後放鬆。</div></details>
+<div class="twocol"><button class="setbtn" data-k="quadAM" data-v="1">☀️ 早上 1 組</button><button class="setbtn" data-k="quadAM" data-v="2">☀️ 早上 2 組</button><button class="setbtn" data-k="quadPM" data-v="1">🌙 晚上 1 組</button><button class="setbtn" data-k="quadPM" data-v="2">🌙 晚上 2 組</button></div></section>
+
+<section class="card" id="card-walk"><div class="name">🚶 走路</div><div class="goal">白天每坐／躺休息約 40–60 分鐘，起來走 5–10 分鐘</div>
+<div class="notice">起床、站立與走路時依醫師指示穿護腰。不需要硬湊次數，吃飯、上廁所等自然走動也可以算。</div>
+<div class="controls"><input class="walkinput" id="walkMin" type="number" min="1" value="5"><span>分鐘</span><button id="addWalk">＋ 完成一次走路</button></div>
+<div class="walklog" id="walkLog"></div><div class="actions"><button class="secondary" id="undoWalk">刪除最後一次</button></div></section>
+</main>
+
+<section class="tip"><strong>⚠️ 小提醒</strong><br>動作與活動量以醫師／復健團隊的指示為優先。若出現新發或明顯加重的疼痛、麻木、無力或其他不適，先停止並聯絡醫療團隊。</section>
+<section class="history"><h2>📅 最近復健紀錄</h2><div id="historyList"></div></section>
+<div class="footer">紀錄會儲存在這台手機的瀏覽器中，不需要登入。</div>
+</div>
+<script>
+const today=new Date(), key=today.toISOString().slice(0,10), store="postop_rehab_"+key;
+let data=JSON.parse(localStorage.getItem(store)||'{"done":{},"sets":{},"walks":[]}'); data.done=data.done||{};data.sets=data.sets||{};data.walks=data.walks||[];
+const save=()=>{localStorage.setItem(store,JSON.stringify(data));render()};
+document.getElementById("dateText").textContent=new Intl.DateTimeFormat("zh-TW",{year:"numeric",month:"long",day:"numeric",weekday:"long"}).format(today);
+function completeItems(){
+ return [
+  data.done.breathAM&&data.done.breathPM,
+  data.done.ankle,
+  Number(data.sets.slrAM||0)>0&&Number(data.sets.slrPM||0)>0,
+  Number(data.sets.quadAM||0)>0&&Number(data.sets.quadPM||0)>0,
+  data.walks.length>0
+ ];
+}
+function render(){
+ document.getElementById("breathAM").classList.toggle("complete",!!data.done.breathAM);document.getElementById("breathPM").classList.toggle("complete",!!data.done.breathPM);document.getElementById("ankleDone").classList.toggle("complete",!!data.done.ankle);
+ document.querySelectorAll(".setbtn").forEach(b=>b.classList.toggle("complete",Number(data.sets[b.dataset.k]||0)===Number(b.dataset.v)));
+ const mins=data.walks.reduce((a,x)=>a+Number(x),0);document.getElementById("walkLog").textContent=`今日走路：${data.walks.length} 次｜累積 ${mins} 分鐘`;
+ const arr=completeItems(),done=arr.filter(Boolean).length,p=Math.round(done/5*100);document.getElementById("percent").textContent=p+"%";document.getElementById("fill").style.width=p+"%";document.getElementById("summary").textContent=p===100?"🎉 今天全部完成！很棒！":`已完成 ${done} / 5 項，慢慢來就好。`;
+ ["breath","ankle","slr","quad","walk"].forEach((id,i)=>document.getElementById("card-"+id).classList.toggle("done",arr[i]));
+ history();
+}
+document.getElementById("breathAM").onclick=()=>{data.done.breathAM=!data.done.breathAM;save()};document.getElementById("breathPM").onclick=()=>{data.done.breathPM=!data.done.breathPM;save()};document.getElementById("ankleDone").onclick=()=>{data.done.ankle=!data.done.ankle;save()};
+document.querySelectorAll(".setbtn").forEach(b=>b.onclick=()=>{let k=b.dataset.k,v=Number(b.dataset.v);data.sets[k]=Number(data.sets[k]||0)===v?0:v;save()});
+document.getElementById("addWalk").onclick=()=>{let m=Number(document.getElementById("walkMin").value);if(m>0){data.walks.push(m);save()}};
+document.getElementById("undoWalk").onclick=()=>{data.walks.pop();save()};
+let left=300,timer=null;function show(){document.getElementById("timer").textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0")}
+document.getElementById("timerBtn").onclick=()=>{if(timer){clearInterval(timer);timer=null;document.getElementById("timerBtn").textContent="▶ 繼續";return}document.getElementById("timerBtn").textContent="⏸ 暫停";timer=setInterval(()=>{left--;show();if(left<=0){clearInterval(timer);timer=null;document.getElementById("timerBtn").textContent="完成！";try{navigator.vibrate&&navigator.vibrate([250,120,250])}catch(e){}alert("5 分鐘深呼吸完成！")}},1000)};
+document.getElementById("resetTimer").onclick=()=>{if(timer)clearInterval(timer);timer=null;left=300;show();document.getElementById("timerBtn").textContent="▶ 開始"};
+function history(){let rows=[];for(let i=0;i<7;i++){let d=new Date();d.setDate(d.getDate()-i);let k=d.toISOString().slice(0,10),r=JSON.parse(localStorage.getItem("postop_rehab_"+k)||'{"done":{},"sets":{},"walks":[]}'),dn=r.done||{},s=r.sets||{},w=r.walks||[];let a=[dn.breathAM&&dn.breathPM,dn.ankle,Number(s.slrAM||0)>0&&Number(s.slrPM||0)>0,Number(s.quadAM||0)>0&&Number(s.quadPM||0)>0,w.length>0],p=Math.round(a.filter(Boolean).length/5*100);rows.push(`<div class="history-row"><span>${d.getMonth()+1}/${d.getDate()}</span><span class="badge">${p===100?"⭐ 完成":p+"%"}</span></div>`)}document.getElementById("historyList").innerHTML=rows.join("")}
+show();render();
+</script></body></html>
